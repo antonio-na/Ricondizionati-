@@ -1,0 +1,21 @@
+Nuova richiesta di valutazione ricevuta!
+
+È stata inviata una nuova richiesta di valutazione sul sito.
+
+ID Richiesta: {{REQUEST_ID}}
+Data: {{REQUEST_DATE}}
+
+Dettagli Utente:
+- Nome: {{USER_NAME}}
+- Email: {{USER_EMAIL}}
+- Indirizzo: {{USER_ADDRESS}}
+
+Dettagli Dispositivo:
+- Modello: {{DEVICE_MODEL}}
+- Capacità: {{DEVICE_CAPACITY}}
+- Stato: {{DEVICE_CONDITION}}
+
+Valutazione Offerta: €{{VALUATION_AMOUNT}}
+Metodo di Pagamento Scelto: {{PAYMENT_METHOD}}
+
+Accedi al pannello di amministrazione per visualizzare tutti i dettagli e gestire la richiesta.

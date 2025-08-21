@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendi il tuo dispositivo usato</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="src/style.css">
+    <!-- Includo Vue.js da un CDN per semplicità -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+
+    <div id="app">
+        <header>
+            <div class="logo">ValutaTel</div>
+            <!-- Qui potrebbe andare un menu di navigazione se necessario -->
+        </header>
+
+        <main class="container">
+            <section class="valuation-wizard">
+                <h1>Quanto vale il tuo dispositivo?</h1>
+                <p class="subtitle">Ottieni una valutazione immediata in pochi semplici passi.</p>
+
+                <!-- Step 1: Modello -->
+                <div class="wizard-step" v-if="!ui.model_selected">
+                    <h2>1. Seleziona il modello</h2>
+                    <div class="options-grid">
+                        <div class="option-card" v-for="model in models" :key="model.id" @click="selectModel(model)">
+                            <!-- Icona placeholder -->
+                            <span>📱</span>
+                            <p>{{ model.name }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Capacità -->
+                <div class="wizard-step" v-if="ui.model_selected && !ui.capacity_selected">
+                    <h2>2. Seleziona la capacità</h2>
+                    <div class="options-grid">
+                        <div class="option-card" v-for="capacity in capacities" :key="capacity.id" @click="selectCapacity(capacity)">
+                            <p>{{ capacity.value }}</p>
+                        </div>
+                    </div>
+                    <button @click="resetSelection" class="back-button">Indietro</button>
+                </div>
+
+                <!-- Step 3: Stato di conservazione -->
+                <div class="wizard-step" v-if="ui.capacity_selected && !ui.condition_selected">
+                    <h2>3. Seleziona lo stato</h2>
+                    <div class="options-grid">
+                        <div class="option-card" v-for="condition in conditions" :key="condition.id" @click="selectCondition(condition)">
+                            <h3>{{ condition.name }}</h3>
+                            <p>{{ condition.description }}</p>
+                        </div>
+                    </div>
+                    <button @click="ui.capacity_selected = null" class="back-button">Indietro</button>
+                </div>
+
+                <!-- Risultato Valutazione -->
+                <div class="valuation-result" v-if="ui.condition_selected && !ui.show_user_form">
+                    <h2>La tua valutazione è:</h2>
+                    <div class="price-display" v-if="!loading_price">
+                        €{{ valuation_price !== null ? valuation_price.toFixed(2) : 'N/D' }}
+                    </div>
+                    <div class="loader" v-if="loading_price"></div>
+                    <p v-if="valuation_price === null && !loading_price">Valutazione non disponibile per questo modello.</p>
+                    <button @click="ui.show_user_form = true" class="cta-button" v-if="valuation_price > 0">Procedi</button>
+                    <button @click="resetSelection" class="back-button">Ricomincia</button>
+                </div>
+
+                <!-- Form dati utente -->
+                <div class="user-form" v-if="ui.show_user_form">
+                    <h2>Manca poco! Inserisci i tuoi dati.</h2>
+                    <form @submit.prevent="submitRequest">
+                        <div class="form-group">
+                            <label for="name">Nome e Cognome</label>
+                            <input type="text" id="name" v-model="user.name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" v-model="user.email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Indirizzo per il ritiro</label>
+                            <textarea id="address" v-model="user.address" rows="4" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Come preferisci essere pagato?</label>
+                            <div class="payment-options">
+                                <label><input type="radio" v-model="user.payment_method" value="PayPal" required> PayPal</label>
+                                <label><input type="radio" v-model="user.payment_method" value="Bonifico"> Bonifico Bancario</label>
+                                <label><input type="radio" v-model="user.payment_method" value="Coupon"> Coupon Sconto</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="cta-button" :disabled="submitting">
+                            <span v-if="!submitting">Invia la mia richiesta</span>
+                            <span v-else>Invio in corso...</span>
+                        </button>
+                        <button @click="ui.show_user_form = false" class="back-button">Indietro</button>
+                    </form>
+                </div>
+
+                <!-- Messaggio finale -->
+                <div class="final-message" v-if="ui.request_submitted">
+                    <h2>Grazie!</h2>
+                    <p>La tua richiesta è stata inviata con successo. A breve riceverai un'email di conferma con tutti i dettagli.</p>
+                    <button @click="resetSelection" class="cta-button">Effettua un'altra valutazione</button>
+                </div>
+                 <div class="error-message" v-if="error">
+                    <p>{{ error }}</p>
+                </div>
+
+            </section>
+        </main>
+
+    </div>
+
+    <!-- Includo il file JavaScript dell'applicazione Vue -->
+    <script src="src/app.js"></script>
+
+</body>
+</html>

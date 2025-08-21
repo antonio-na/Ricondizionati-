@@ -1,0 +1,25 @@
+Ciao {{USER_NAME}},
+
+Grazie per aver richiesto una valutazione per il tuo dispositivo tramite ValutaTel.
+
+Abbiamo ricevuto la tua richiesta e la stiamo elaborando. Ecco un riepilogo dei tuoi dati:
+
+ID Richiesta: {{REQUEST_ID}}
+Data: {{REQUEST_DATE}}
+
+Dispositivo:
+- Modello: {{DEVICE_MODEL}}
+- Capacità: {{DEVICE_CAPACITY}}
+- Stato: {{DEVICE_CONDITION}}
+
+Valutazione Offerta: €{{VALUATION_AMOUNT}}
+
+Metodo di Pagamento Scelto: {{PAYMENT_METHOD}}
+
+Indirizzo per il ritiro:
+{{USER_ADDRESS}}
+
+A breve riceverai ulteriori comunicazioni riguardo i prossimi passi per il ritiro del tuo dispositivo.
+
+Grazie,
+Il Team di ValutaTel

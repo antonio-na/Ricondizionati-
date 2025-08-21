@@ -1,0 +1,197 @@
+/* Stile Globale e Layout - Ispirato a nulab.it */
+
+:root {
+    --primary-color: #0d6efd; /* Blu vibrante */
+    --secondary-color: #6c757d; /* Grigio per testo secondario */
+    --background-color: #f8f9fa;
+    --white: #ffffff;
+    --border-color: #dee2e6;
+    --text-color: #212529;
+    --font-family: 'Roboto', sans-serif;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    background-color: var(--white);
+    padding: 15px 30px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+main.container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 20px;
+}
+
+.valuation-wizard {
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: var(--secondary-color);
+    margin-bottom: 40px;
+}
+
+/* Stile per i Passaggi del Wizard */
+.wizard-step {
+    background: var(--white);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+}
+
+.wizard-step h2 {
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+}
+
+.option-card {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.option-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.1);
+    transform: translateY(-5px);
+}
+
+.option-card span {
+    font-size: 2rem;
+}
+
+.option-card h3 {
+    margin-top: 0;
+    color: var(--primary-color);
+}
+
+/* Risultato e Form */
+.valuation-result, .user-form, .final-message {
+    background: var(--white);
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.price-display {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 20px 0;
+}
+
+.cta-button {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    border-radius: 5px;
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin: 10px;
+}
+
+.cta-button:hover {
+    background-color: #0b5ed7;
+}
+.cta-button:disabled {
+    background-color: var(--secondary-color);
+    cursor: not-allowed;
+}
+
+.back-button {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--secondary-color);
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+/* Stili Form */
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+input[type="text"], input[type="email"], textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+.payment-options label {
+    margin-right: 20px;
+}
+
+/* Messaggi di errore e Loader */
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    padding: 15px;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+.loader {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
