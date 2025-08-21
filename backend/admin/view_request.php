@@ -9,7 +9,7 @@ $pdo = Database::getConnection();
 $request_id = $_GET['id'] ?? null;
 
 if (!$request_id || !filter_var($request_id, FILTER_VALIDATE_INT)) {
-    header('Location: manage_requests.php');
+    header('Location: manage_requests.php'); // Assumiamo che la pagina con l'elenco si chiami così
     exit();
 }
 
@@ -44,7 +44,10 @@ if (!$request) {
     exit();
 }
 
+// Decodifica entrambi i campi JSON
 $device_details = json_decode($request['device_details_json'], true);
+$payment_details = json_decode($request['payment_details_json'], true); // <-- MODIFICA: Aggiunto decode per i pagamenti
+
 ?>
 <!DOCTYPE html>
 <html lang="it">
@@ -57,14 +60,13 @@ $device_details = json_decode($request['device_details_json'], true);
         .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .detail-box { background: #f8f9fa; padding: 15px; border-radius: 5px; }
         .detail-box h3 { margin-top: 0; color: var(--primary-color); }
+        .detail-box p { margin-bottom: 5px; } /* Spaziatura ridotta */
     </style>
 </head>
 <body>
 <div class="container">
     <h1>Dettaglio Richiesta #<?php echo htmlspecialchars($request['id']); ?></h1>
-    <p><a href="manage_requests.php">Torna a Tutte le Richieste</a></p>
-
-    <?php if ($success_message): ?><div class="message success"><?php echo htmlspecialchars($success_message); ?></div><?php endif; ?>
+    <p><a href="index.php">Torna a Tutte le Richieste</a></p> <?php if ($success_message): ?><div class="message success"><?php echo htmlspecialchars($success_message); ?></div><?php endif; ?>
     <?php if ($error_message): ?><div class="message error"><?php echo htmlspecialchars($error_message); ?></div><?php endif; ?>
 
     <div class="details-grid">
@@ -72,6 +74,7 @@ $device_details = json_decode($request['device_details_json'], true);
             <h3>Dati Utente</h3>
             <p><strong>Nome:</strong> <?php echo htmlspecialchars($request['user_name']); ?></p>
             <p><strong>Email:</strong> <?php echo htmlspecialchars($request['user_email']); ?></p>
+            <p><strong>Telefono:</strong> <?php echo htmlspecialchars($request['user_phone'] ?? 'N/D'); ?></p> 
             <p><strong>Indirizzo per il ritiro:</strong><br><?php echo nl2br(htmlspecialchars($request['user_address'])); ?></p>
         </div>
         <div class="detail-box">
@@ -83,10 +86,21 @@ $device_details = json_decode($request['device_details_json'], true);
             <?php endif; ?>
         </div>
         <div class="detail-box">
-            <h3>Dati Valutazione</h3>
-            <p><strong>Importo Valutazione:</strong> € <?php echo htmlspecialchars(number_format($request['valuation_amount'], 2, ',', '.')); ?></p>
-            <p><strong>Metodo di Pagamento:</strong> <?php echo htmlspecialchars($request['payment_method']); ?></p>
+            <h3>Dati Valutazione e Pagamento</h3> <p><strong>Importo Valutazione:</strong> € <?php echo htmlspecialchars(number_format($request['valuation_amount'], 2, ',', '.')); ?></p>
             <p><strong>Data Richiesta:</strong> <?php echo htmlspecialchars(date('d/m/Y H:i', strtotime($request['created_at']))); ?></p>
+            <hr style="border-top: 1px solid #ddd; margin: 10px 0;">
+            
+            <?php if ($payment_details && !empty($payment_details['method'])): ?>
+                <p><strong>Metodo Pagamento:</strong> <?php echo htmlspecialchars($payment_details['method']); ?></p>
+                <?php if ($payment_details['method'] === 'PayPal' && !empty($payment_details['paypal_email'])): ?>
+                    <p><strong>Email PayPal:</strong> <?php echo htmlspecialchars($payment_details['paypal_email']); ?></p>
+                <?php elseif ($payment_details['method'] === 'Bonifico'): ?>
+                    <p><strong>IBAN:</strong> <?php echo htmlspecialchars($payment_details['iban'] ?? 'N/D'); ?></p>
+                    <p><strong>Intestatario:</strong> <?php echo htmlspecialchars($payment_details['account_holder'] ?? 'N/D'); ?></p>
+                <?php endif; ?>
+            <?php else: ?>
+                <p><strong>Metodo Pagamento:</strong> Non specificato.</p>
+            <?php endif; ?>
         </div>
         <div class="detail-box">
             <h3>Stato Richiesta</h3>
@@ -98,7 +112,7 @@ $device_details = json_decode($request['device_details_json'], true);
                         <?php foreach ($possible_statuses as $status): ?>
                             <option value="<?php echo $status; ?>" <?php echo ($status == $request['status']) ? 'selected' : ''; ?>>
                                 <?php echo $status; ?>
-                            </option>
+                            </                            </option>
                         <?php endforeach; ?>
                     </select>
                 </div>

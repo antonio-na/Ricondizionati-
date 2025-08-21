@@ -4,94 +4,102 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
-// Gestione della richiesta pre-flight OPTIONS
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
 require_once __DIR__ . '/../core/database.php';
 
-// Assicura che la richiesta sia di tipo POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405); // Method Not Allowed
+    http_response_code(405);
     echo json_encode(['success' => false, 'message' => 'Metodo non consentito.']);
     exit();
 }
 
-$response = ['success' => false, 'message' => ''];
+$response = ['success' => false, 'message' => 'Errore sconosciuto.'];
 $input = json_decode(file_get_contents('php://input'), true);
 
-// --- Validazione Dati ---
-if (empty($input['user_name']) || empty($input['user_email']) || empty($input['user_address']) || empty($input['payment_method'])) {
+// --- [MODIFICATO] Validazione Dati sulla nuova struttura ---
+$user_data = $input['user_data'] ?? [];
+$payment_data = $input['payment_data'] ?? [];
+$device_data = $input['device_data'] ?? [];
+
+if (empty($user_data['name']) || empty($user_data['email']) || empty($user_data['phone']) || empty($user_data['address']) || empty($user_data['city']) || empty($user_data['province'])) {
     http_response_code(400);
     $response['message'] = 'Dati utente mancanti.';
     echo json_encode($response);
     exit();
 }
-if (!filter_var($input['user_email'], FILTER_VALIDATE_EMAIL)) {
+if (!filter_var($user_data['email'], FILTER_VALIDATE_EMAIL)) {
     http_response_code(400);
     $response['message'] = 'Formato email non valido.';
     echo json_encode($response);
     exit();
 }
-if (empty($input['device']['model_id']) || empty($input['device']['capacity_id']) || empty($input['device']['condition_id'])) {
+if (empty($device_data['model_id']) || empty($device_data['capacity_id']) || empty($device_data['condition_id'])) {
     http_response_code(400);
     $response['message'] = 'Dati dispositivo mancanti.';
     echo json_encode($response);
     exit();
 }
+// Potresti aggiungere qui una validazione più dettagliata per i dati di pagamento
 
 try {
     $pdo = Database::getConnection();
 
-    // --- Sicurezza: Ricalcola il prezzo sul server ---
+    // Ricalcola il prezzo sul server per sicurezza
     $stmt_price = $pdo->prepare("SELECT price FROM prices WHERE model_id = ? AND capacity_id = ? AND condition_id = ?");
-    $stmt_price->execute([$input['device']['model_id'], $input['device']['capacity_id'], $input['device']['condition_id']]);
+    $stmt_price->execute([$device_data['model_id'], $device_data['capacity_id'], $device_data['condition_id']]);
     $price_result = $stmt_price->fetch();
 
     if (!$price_result) {
         http_response_code(400);
-        $response['message'] = 'Prezzo non trovato per il dispositivo selezionato. Impossibile procedere.';
+        $response['message'] = 'Prezzo non trovato per il dispositivo selezionato.';
         echo json_encode($response);
         exit();
     }
     $valuation_amount = $price_result['price'];
 
-    // Prepara i dettagli del dispositivo per il salvataggio in JSON
+    // Recupera i dettagli del dispositivo per salvarli
     $stmt_details = $pdo->prepare("
         SELECT m.name as model_name, cap.value as capacity_value, con.name as condition_name
         FROM models m, capacities cap, conditions con
         WHERE m.id = ? AND cap.id = ? AND con.id = ?
     ");
-    $stmt_details->execute([$input['device']['model_id'], $input['device']['capacity_id'], $input['device']['condition_id']]);
-    $device_details_data = $stmt_details->fetch(PDO::FETCH_ASSOC);
-    $device_details_json = json_encode($device_details_data);
+    $stmt_details->execute([$device_data['model_id'], $device_data['capacity_id'], $device_data['condition_id']]);
+    $device_details_json = json_encode($stmt_details->fetch(PDO::FETCH_ASSOC));
 
-    // --- Inserimento nel database ---
-    $sql = "INSERT INTO trade_in_requests (user_name, user_email, user_address, payment_method, device_details_json, valuation_amount)
-            VALUES (:user_name, :user_email, :user_address, :payment_method, :device_details_json, :valuation_amount)";
+    // Concatena l'indirizzo completo
+    $full_address = $user_data['address'] . ', ' . $user_data['city'] . ' (' . $user_data['province'] . ')';
+
+    // Salva i dettagli di pagamento come JSON
+    $payment_details_json = json_encode($payment_data);
+
+    // --- [MODIFICATO] Inserimento nel database con i nuovi campi ---
+    $sql = "INSERT INTO trade_in_requests 
+                (user_name, user_email, user_phone, user_address, payment_details_json, device_details_json, valuation_amount)
+            VALUES 
+                (:user_name, :user_email, :user_phone, :user_address, :payment_details_json, :device_details_json, :valuation_amount)";
 
     $stmt_insert = $pdo->prepare($sql);
     $stmt_insert->execute([
-        ':user_name' => $input['user_name'],
-        ':user_email' => $input['user_email'],
-        ':user_address' => $input['user_address'],
-        ':payment_method' => $input['payment_method'],
+        ':user_name' => $user_data['name'],
+        ':user_email' => $user_data['email'],
+        ':user_phone' => $user_data['phone'],
+        ':user_address' => $full_address,
+        ':payment_details_json' => $payment_details_json,
         ':device_details_json' => $device_details_json,
         ':valuation_amount' => $valuation_amount
     ]);
 
     $request_id = $pdo->lastInsertId();
 
-    // --- Invio delle email di notifica ---
+    // Le email sono ancora disabilitate per debug
+    /*
     require_once __DIR__ . '/../core/email_service.php';
-    $user_email_sent = send_user_confirmation_email($request_id);
-    $admin_email_sent = send_admin_notification_email($request_id);
-
-    if (!$user_email_sent || !$admin_email_sent) {
-        // Non blocchiamo la risposta di successo, ma logghiamo l'errore
-        error_log("Fallimento nell'invio di una o più email per la richiesta ID: $request_id");
-    }
+    send_user_confirmation_email($request_id);
+    send_admin_notification_email($request_id);
+    */
 
     $response['success'] = true;
     $response['message'] = 'Richiesta inviata con successo!';

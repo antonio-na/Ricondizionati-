@@ -17,8 +17,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_prices'])) {
     $prices = $_POST['price'];
     $model_id = $_POST['model_id'];
 
+    // [CORREZIONE 1] Usa un nome diverso per il segnaposto nella clausola UPDATE.
     $sql = "INSERT INTO prices (model_id, capacity_id, condition_id, price) VALUES (:model_id, :capacity_id, :condition_id, :price)
-            ON DUPLICATE KEY UPDATE price = :price";
+            ON DUPLICATE KEY UPDATE price = :update_price";
     $stmt = $pdo->prepare($sql);
 
     $pdo->beginTransaction();
@@ -26,11 +27,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_prices'])) {
         foreach ($prices as $capacity_id => $condition_prices) {
             foreach ($condition_prices as $condition_id => $price) {
                 if (is_numeric($price) && $price >= 0) {
+                    
+                    // [CORREZIONE 2] Aggiungi il nuovo parametro all'array di execute.
                     $stmt->execute([
                         'model_id' => $model_id,
                         'capacity_id' => $capacity_id,
                         'condition_id' => $condition_id,
-                        'price' => $price
+                        'price' => $price,
+                        'update_price' => $price
                     ]);
                 }
             }

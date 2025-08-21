@@ -6,15 +6,13 @@
     <title>Vendi il tuo dispositivo usato</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="src/style.css">
-    <!-- Includo Vue.js da un CDN per semplicità -->
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 </head>
 <body>
 
     <div id="app">
         <header>
             <div class="logo">ValutaTel</div>
-            <!-- Qui potrebbe andare un menu di navigazione se necessario -->
         </header>
 
         <main class="container">
@@ -27,7 +25,6 @@
                     <h2>1. Seleziona il modello</h2>
                     <div class="options-grid">
                         <div class="option-card" v-for="model in models" :key="model.id" @click="selectModel(model)">
-                            <!-- Icona placeholder -->
                             <span>📱</span>
                             <p>{{ model.name }}</p>
                         </div>
@@ -69,7 +66,7 @@
                     <button @click="resetSelection" class="back-button">Ricomincia</button>
                 </div>
 
-                <!-- Form dati utente -->
+                <!-- Form dati utente (con le tue modifiche) -->
                 <div class="user-form" v-if="ui.show_user_form">
                     <h2>Manca poco! Inserisci i tuoi dati.</h2>
                     <form @submit.prevent="submitRequest">
@@ -78,26 +75,47 @@
                             <input type="text" id="name" v-model="user.name" required>
                         </div>
                         <div class="form-group">
-                            <label for="email">Email</label>
+                            <label for="email">Email di Contatto</label>
                             <input type="email" id="email" v-model="user.email" required>
                         </div>
                         <div class="form-group">
-                            <label for="address">Indirizzo per il ritiro</label>
-                            <textarea id="address" v-model="user.address" rows="4" required></textarea>
+                            <label for="phone">Numero di Telefono</label>
+                            <input type="tel" id="phone" v-model="user.phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Indietro</label>
+                            <input type="text" id="address" v-model="user.address" placeholder="Via, numero civico" required style="margin-bottom: 10px;">
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" id="city" v-model="user.city" placeholder="Città" required style="flex: 2;">
+                                <input type="text" id="province" v-model="user.province" placeholder="Provincia (es. SA)" required style="flex: 1;">
+                            </div>
                         </div>
                         <div class="form-group">
                             <label>Come preferisci essere pagato?</label>
                             <div class="payment-options">
                                 <label><input type="radio" v-model="user.payment_method" value="PayPal" required> PayPal</label>
                                 <label><input type="radio" v-model="user.payment_method" value="Bonifico"> Bonifico Bancario</label>
-                                <label><input type="radio" v-model="user.payment_method" value="Coupon"> Coupon Sconto</label>
+                            </div>
+                        </div>
+                        <div class="form-group" v-if="user.payment_method === 'PayPal'">
+                            <label for="paypal_email">Email PayPal</label>
+                            <input type="email" id="paypal_email" v-model="user.paypal_email" placeholder="Il tuo indirizzo email PayPal" required>
+                        </div>
+                        <div v-if="user.payment_method === 'Bonifico'">
+                            <div class="form-group">
+                                <label for="iban">IBAN</label>
+                                <input type="text" id="iban" v-model="user.iban" placeholder="Il tuo codice IBAN" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="account_holder">Intestatario del Conto</label>
+                                <input type="text" id="account_holder" v-model="user.account_holder" placeholder="Nome e Cognome dell'intestatario" required>
                             </div>
                         </div>
                         <button type="submit" class="cta-button" :disabled="submitting">
                             <span v-if="!submitting">Invia la mia richiesta</span>
                             <span v-else>Invio in corso...</span>
                         </button>
-                        <button @click="ui.show_user_form = false" class="back-button">Indietro</button>
+                        <button type="button" @click="ui.show_user_form = false" class="back-button">Indietro</button>
                     </form>
                 </div>
 
@@ -107,17 +125,14 @@
                     <p>La tua richiesta è stata inviata con successo. A breve riceverai un'email di conferma con tutti i dettagli.</p>
                     <button @click="resetSelection" class="cta-button">Effettua un'altra valutazione</button>
                 </div>
-                 <div class="error-message" v-if="error">
+                <div class="error-message" v-if="error">
                     <p>{{ error }}</p>
                 </div>
 
             </section>
         </main>
-
     </div>
 
-    <!-- Includo il file JavaScript dell'applicazione Vue -->
     <script src="src/app.js"></script>
-
 </body>
 </html>

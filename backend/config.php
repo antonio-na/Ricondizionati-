@@ -4,10 +4,10 @@
 // In un'applicazione reale, queste credenziali dovrebbero essere
 // memorizzate in modo sicuro e non tracciate da Git.
 
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'valutazione_db');
-define('DB_USER', 'root');
-define('DB_PASS', 'password_segnaposto');
+define('DB_HOST', '31.11.39.168');
+define('DB_NAME', 'Sql1810635_2');
+define('DB_USER', 'Sql1810635');
+define('DB_PASS', 'Nulab2025!');
 define('DB_CHARSET', 'utf8mb4');
 
 // Configurazione per la sessione di login
