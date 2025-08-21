@@ -1,12 +1,13 @@
 /* Stile Globale e Layout - Ispirato a nulab.it */
 
 :root {
-    --primary-color: #0d6efd; /* Blu vibrante */
-    --secondary-color: #6c757d; /* Grigio per testo secondario */
-    --background-color: #f8f9fa;
+    --primary-color: #008080; /* Dark Teal */
+    --accent-color: #40E0D0; /* Cyan/Green */
+    --secondary-color: #333333; /* Using dark grey for secondary text */
+    --background-color: #FFFFFF;
     --white: #ffffff;
-    --border-color: #dee2e6;
-    --text-color: #212529;
+    --border-color: #dddddd;
+    --text-color: #333333;
     --font-family: 'Roboto', sans-serif;
 }
 
@@ -93,7 +94,7 @@ h1 {
 
 .option-card:hover {
     border-color: var(--primary-color);
-    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 128, 128, 0.1);
     transform: translateY(-5px);
 }
 
@@ -135,7 +136,7 @@ h1 {
 }
 
 .cta-button:hover {
-    background-color: #0b5ed7;
+    background-color: #006666; /* Darker teal */
 }
 .cta-button:disabled {
     background-color: var(--secondary-color);

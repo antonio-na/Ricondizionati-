@@ -18,11 +18,11 @@ define('SESSION_NAME', 'admin_session');
 define('SECRET_KEY', 'la_tua_chiave_segreta_qui');
 
 // Configurazione per l'invio di email tramite SMTP
-define('SMTP_HOST', 'smtp.example.com');
-define('SMTP_USERNAME', 'user@example.com');
-define('SMTP_PASSWORD', 'smtp_password');
-define('SMTP_PORT', 587); // o 465 per SSL
-define('SMTP_FROM_EMAIL', 'noreply@example.com');
+define('SMTP_HOST', 'smtps.aruba.it');
+define('SMTP_USERNAME', 'ricondizionati@nu-lab.it');
+define('SMTP_PASSWORD', 'Nulab2025!');
+define('SMTP_PORT', 465); // o 465 per SSL
+define('SMTP_FROM_EMAIL', 'ricondizionati@nu-lab.it');
 define('SMTP_FROM_NAME', 'ValutaTel');
-define('ADMIN_EMAIL', 'admin@example.com'); // Email dell'amministratore per le notifiche
+define('ADMIN_EMAIL', 'ricondizionati@nu-lab.it'); // Email dell'amministratore per le notifiche
 ?>

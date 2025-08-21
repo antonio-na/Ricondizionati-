@@ -94,12 +94,10 @@ try {
 
     $request_id = $pdo->lastInsertId();
 
-    // Le email sono ancora disabilitate per debug
-    /*
+    // Invia le email di notifica
     require_once __DIR__ . '/../core/email_service.php';
     send_user_confirmation_email($request_id);
     send_admin_notification_email($request_id);
-    */
 
     $response['success'] = true;
     $response['message'] = 'Richiesta inviata con successo!';

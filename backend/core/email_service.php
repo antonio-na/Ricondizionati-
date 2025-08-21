@@ -27,7 +27,7 @@ function send_email($to, $subject, $body) {
         $mail->SMTPAuth   = true;
         $mail->Username   = SMTP_USERNAME;
         $mail->Password   = SMTP_PASSWORD;
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
         $mail->Port       = SMTP_PORT;
 
         // Mittente e Destinatario
